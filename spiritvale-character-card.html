@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spiritvale キャラクターカードメーカー</title>
+<style>
+  :root{
+    --bg-page-1:#fff3f8;
+    --bg-page-2:#f2ecff;
+    --bg-page-3:#e9fbf4;
+
+    --pink:#ff8fbd;
+    --pink-dim:#ffc2dc;
+    --pink-soft:#ffeaf3;
+
+    --lavender:#a893ff;
+    --lavender-dim:#d6cbff;
+    --lavender-soft:#f1ecff;
+
+    --mint:#4fd0ac;
+    --mint-dim:#a7ecd7;
+    --mint-soft:#e4faf3;
+
+    --peach:#ffb26b;
+    --peach-dim:#ffdbb0;
+    --peach-soft:#fff2e2;
+
+    --panel:#ffffff;
+    --panel-border:#ffd9ea;
+
+    --text-0:#5b4a63;
+    --text-1:#8d7a95;
+    --text-2:#bcadc4;
+
+    --danger:#ff6f91;
+    --radius:22px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 10% 8%, rgba(255,194,220,0.3), transparent 40%),
+      radial-gradient(circle at 90% 12%, rgba(214,203,255,0.28), transparent 42%),
+      radial-gradient(circle at 15% 92%, rgba(167,236,215,0.24), transparent 40%),
+      radial-gradient(circle at 88% 90%, rgba(255,219,176,0.2), transparent 40%),
+      linear-gradient(160deg, var(--bg-page-1), var(--bg-page-2) 55%, var(--bg-page-3));
+    background-attachment:fixed;
+    color:var(--text-0);
+    font-family:"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .app{max-width:1420px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:30px;}
+  header.top h1{
+    font-size:1.7rem;
+    letter-spacing:0.03em;
+    margin:0 0 8px;
+    color:var(--text-0);
+  }
+  header.top p{color:var(--text-1);margin:0;font-size:0.9rem;}
+
+  .layout{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  /* ---------- form panel ---------- */
+  .form-panel{
+    flex:1 1 460px;
+    max-width:600px;
+    background:var(--panel);
+    border:2px solid var(--panel-border);
+    border-radius:var(--radius);
+    padding:22px 22px 26px;
+    box-shadow:0 14px 34px rgba(255,143,189,0.16);
+  }
+  .form-panel h2, .preview-panel h2{
+    font-size:1rem;
+    color:var(--pink);
+    letter-spacing:0.03em;
+    margin:0 0 18px;
+    padding-bottom:10px;
+    border-bottom:2px dashed var(--pink-dim);
+  }
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;
+    font-size:0.82rem;
+    color:var(--text-1);
+    margin-bottom:6px;
+    font-weight:600;
+  }
+  input[type="text"], textarea{
+    width:100%;
+    background:var(--pink-soft);
+    border:2px solid var(--panel-border);
+    border-radius:14px;
+    padding:10px 14px;
+    color:var(--text-0);
+    font-size:0.92rem;
+    font-family:inherit;
+    resize:vertical;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--pink);
+    box-shadow:0 0 0 3px rgba(255,143,189,0.18);
+  }
+  .char-count{
+    text-align:right;
+    font-size:0.72rem;
+    color:var(--text-2);
+    margin-top:4px;
+  }
+
+  /* image upload */
+  .image-upload{
+    position:relative;
+    border:2.5px dashed var(--pink-dim);
+    border-radius:18px;
+    min-height:120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    overflow:hidden;
+    background:var(--lavender-soft);
+    transition:border-color .15s, background .15s;
+  }
+  .image-upload.dragover{
+    border-color:var(--mint);
+    background:var(--mint-soft);
+  }
+  .image-upload img{
+    display:none;
+    width:100%;
+    height:140px;
+    object-fit:cover;
+  }
+  .image-upload-placeholder{
+    text-align:center;
+    color:var(--text-2);
+    font-size:0.8rem;
+    padding:14px;
+    line-height:1.7;
+  }
+  .image-upload-placeholder .emoji{font-size:1.6rem;display:block;margin-bottom:4px;}
+  .btn-text{
+    display:none;
+    margin-top:8px;
+    background:none;
+    border:none;
+    color:var(--danger);
+    font-size:0.78rem;
+    cursor:pointer;
+    padding:0;
+    font-weight:600;
+  }
+  .btn-text:hover{text-decoration:underline;}
+
+  /* checkbox groups */
+  .checkbox-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chk{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-soft);
+    border:2px solid var(--panel-border);
+    border-radius:20px;
+    padding:6px 13px;
+    font-size:0.8rem;
+    color:var(--text-1);
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .15s, color .15s, background .15s, transform .1s;
+    font-weight:600;
+  }
+  .chk:hover{transform:translateY(-1px);}
+  .chk input{accent-color:var(--pink);cursor:pointer;}
+  .chk:has(input:checked){
+    border-color:var(--pink);
+    color:#fff;
+    background:linear-gradient(120deg, var(--pink), #ffb0d3);
+  }
+  .field > label + .checkbox-group{margin-top:2px;}
+
+
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:22px;
+  }
+  button.btn-primary, button.btn-secondary{
+    width:100%;
+    padding:13px 14px;
+    border-radius:999px;
+    font-size:0.9rem;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+    font-family:inherit;
+    transition:transform .12s, filter .12s;
+  }
+  button.btn-primary{
+    background:linear-gradient(90deg, var(--pink), var(--peach));
+    color:#fff;
+    box-shadow:0 8px 18px rgba(255,143,189,0.35);
+  }
+  button.btn-primary:hover{transform:translateY(-2px) scale(1.01);filter:brightness(1.04);}
+  button.btn-secondary{
+    background:var(--lavender-soft);
+    border:2px solid var(--lavender-dim);
+    color:var(--text-1);
+  }
+  button.btn-secondary:hover{border-color:var(--danger);color:var(--danger);}
+  .hint{
+    font-size:0.72rem;
+    color:var(--text-2);
+    margin:12px 2px 0;
+    line-height:1.6;
+  }
+
+  /* ---------- preview panel ---------- */
+  .preview-panel{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .preview-panel h2{width:100%;max-width:380px;}
+
+  .card{width:380px;}
+  .card-frame{
+    position:relative;
+    padding:3px;
+    border-radius:24px;
+    background:linear-gradient(150deg, var(--pink-dim), var(--lavender-dim));
+    box-shadow:0 14px 30px rgba(168,147,255,0.18);
+  }
+  .card-inner{
+    position:relative;
+    background:#fffdfb;
+    border-radius:24px;
+    padding:18px;
+    overflow:hidden;
+  }
+
+  .card-portrait{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:20px;
+    overflow:hidden;
+    border:3px solid var(--pink-dim);
+    background:linear-gradient(160deg, var(--lavender-soft), var(--pink-soft));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .card-portrait img{
+    display:none;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .no-image{
+    color:var(--text-2);
+    font-size:0.8rem;
+    letter-spacing:0.1em;
+    text-align:center;
+    font-weight:700;
+  }
+  .no-image .emoji{font-size:1.4rem;display:block;margin-bottom:6px;opacity:0.7;}
+
+  .card-body{padding-top:16px;}
+  .card-name{
+    text-align:center;
+    font-size:1.4rem;
+    margin:0 0 12px;
+    color:var(--text-0);
+    font-weight:800;
+    letter-spacing:0.02em;
+    word-break:break-word;
+  }
+  .card-jobs{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .job-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:0.8rem;
+    font-weight:700;
+    border:1px solid transparent;
+  }
+  .job-badge .job-label{
+    font-size:0.62rem;
+    letter-spacing:0.06em;
+    opacity:0.7;
+  }
+  .job-main{background:var(--pink-soft);color:#c65d86;border-color:var(--pink-dim);}
+  .job-sub{background:var(--lavender-soft);color:#6c58c9;border-color:var(--lavender-dim);}
+
+  .card-divider{
+    text-align:center;
+    color:var(--pink-dim);
+    font-size:0.85rem;
+    margin:4px 0 14px;
+    letter-spacing:0.3em;
+  }
+
+  .card-comment{
+    position:relative;
+    font-size:0.85rem;
+    color:var(--text-1);
+    text-align:center;
+    line-height:1.7;
+    margin:0 0 18px;
+    padding:14px 14px;
+    background:#faf7fa;
+    border:1px solid var(--panel-border);
+    border-radius:14px;
+    word-break:break-word;
+    white-space:pre-wrap;
+    font-weight:600;
+  }
+
+  .card-section{margin-bottom:13px;}
+  .card-section:last-child{margin-bottom:0;}
+  .card-section-title{
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    color:var(--text-1);
+    margin-bottom:7px;
+    font-weight:700;
+  }
+  .tag-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .tag{
+    font-size:0.72rem;
+    padding:4px 12px;
+    border-radius:999px;
+    font-weight:700;
+    border:1px solid transparent;
+  }
+  .tag-playstyle{background:var(--pink-soft);color:#c65d86;border-color:var(--pink-dim);}
+  .tag-content{background:var(--mint-soft);color:#2f9678;border-color:var(--mint-dim);}
+  .tag-weekday{background:var(--lavender-soft);color:#6c58c9;border-color:var(--lavender-dim);}
+  .tag-weekend{background:var(--peach-soft);color:#c17a2e;border-color:var(--peach-dim);}
+  .tag-empty{
+    font-size:0.72rem;
+    color:var(--text-2);
+    font-weight:600;
+  }
+
+  .card-footer{
+    text-align:center;
+    margin-top:18px;
+    padding-top:12px;
+    border-top:1px solid var(--panel-border);
+    font-size:0.64rem;
+    letter-spacing:0.08em;
+    color:var(--text-2);
+    font-weight:700;
+  }
+
+  @media (max-width:1040px){
+    .layout{flex-direction:column;align-items:center;}
+    .form-panel{max-width:600px;width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>Spiritvale キャラクターカードメーカー</h1>
+    <p>コミュニティ用の自己紹介カードを作ろう</p>
+  </header>
+
+  <div class="layout">
+    <!-- ================= FORM ================= -->
+    <section class="form-panel">
+      <h2>キャラクター情報を入力</h2>
+
+      <div class="field">
+        <label>キャラ画像</label>
+        <div class="image-upload" id="imageDrop">
+          <img id="thumbImg" alt="プレビュー画像">
+          <div class="image-upload-placeholder" id="imagePlaceholder"><span class="emoji">📷</span>クリック、またはドラッグ＆ドロップで画像を選択</div>
+          <input type="file" id="imageInput" accept="image/*" hidden>
+        </div>
+        <button type="button" class="btn-text" id="imageClearBtn">画像を削除</button>
+      </div>
+
+      <div class="field">
+        <label for="charName">キャラ名</label>
+        <input type="text" id="charName" maxlength="20" placeholder="例）フィオナ">
+      </div>
+
+      <div class="field">
+        <label for="mainJob">メインキャラのジョブ</label>
+        <input type="text" id="mainJob" maxlength="20" placeholder="例）ソードファイター">
+      </div>
+
+      <div class="field">
+        <label for="subJob">サブキャラのジョブ</label>
+        <input type="text" id="subJob" maxlength="20" placeholder="例）ウィッチ">
+      </div>
+
+      <div class="field">
+        <label for="comment">ひとこと</label>
+        <textarea id="comment" maxlength="80" rows="3" placeholder="例）まったり狩り好きです、よろしくね！"></textarea>
+        <div class="char-count"><span id="commentCount">0</span>/80</div>
+      </div>
+
+      <div class="field">
+        <label>プレイスタイル</label>
+        <div class="checkbox-group" data-group="playstyle">
+          <label class="chk"><input type="checkbox" value="おひとりさま">おひとりさま</label>
+          <label class="chk"><input type="checkbox" value="ペア・トリオ">ペア・トリオ</label>
+          <label class="chk"><input type="checkbox" value="みんなでわいわい">みんなでわいわい</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>好きなコンテンツ</label>
+        <div class="checkbox-group" data-group="content">
+          <label class="chk"><input type="checkbox" value="平地狩り">平地狩り</label>
+          <label class="chk"><input type="checkbox" value="Boss狩り">Boss狩り</label>
+          <label class="chk"><input type="checkbox" value="Echoing Spire">Echoing Spire</label>
+          <label class="chk"><input type="checkbox" value="PvP">PvP</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>プレイ時間帯（平日）</label>
+        <div class="checkbox-group" data-group="weekday">
+          <label class="chk"><input type="checkbox" value="2:00-6:00">2:00-6:00</label>
+          <label class="chk"><input type="checkbox" value="6:00-10:00">6:00-10:00</label>
+          <label class="chk"><input type="checkbox" value="10:00-14:00">10:00-14:00</label>
+          <label class="chk"><input type="checkbox" value="14:00-18:00">14:00-18:00</label>
+          <label class="chk"><input type="checkbox" value="18:00-22:00">18:00-22:00</label>
+          <label class="chk"><input type="checkbox" value="22:00-2:00">22:00-2:00</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>プレイ時間帯（休日）</label>
+        <div class="checkbox-group" data-group="weekend">
+          <label class="chk"><input type="checkbox" value="2:00-6:00">2:00-6:00</label>
+          <label class="chk"><input type="checkbox" value="6:00-10:00">6:00-10:00</label>
+          <label class="chk"><input type="checkbox" value="10:00-14:00">10:00-14:00</label>
+          <label class="chk"><input type="checkbox" value="14:00-18:00">14:00-18:00</label>
+          <label class="chk"><input type="checkbox" value="18:00-22:00">18:00-22:00</label>
+          <label class="chk"><input type="checkbox" value="22:00-2:00">22:00-2:00</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="downloadBtn">🖼 カードを画像として保存</button>
+        <button type="button" class="btn-secondary" id="resetBtn">🔄 リセット</button>
+      </div>
+      <p class="hint">※画像保存はChromeまたはEdgeでの利用を推奨します。うまく保存できない場合はブラウザのスクリーンショット機能をご利用ください。</p>
+    </section>
+
+    <!-- ================= PREVIEW ================= -->
+    <section class="preview-panel">
+      <h2>プレビュー</h2>
+      <div class="card" id="card">
+        <div class="card-frame">
+          <div class="card-inner">
+            <div class="card-portrait" id="cardPortrait">
+              <img id="cardPortraitImg" alt="キャラ画像">
+              <div class="no-image" id="cardNoImage"><span class="emoji">🖼</span>NO IMAGE</div>
+            </div>
+            <div class="card-body">
+              <h3 class="card-name" id="cardName">キャラ名</h3>
+              <div class="card-jobs">
+                <span class="job-badge job-main"><span class="job-label">MAIN</span><span id="cardMainJob">―</span></span>
+                <span class="job-badge job-sub"><span class="job-label">SUB</span><span id="cardSubJob">―</span></span>
+              </div>
+              <div class="card-divider">・ ・ ・</div>
+              <p class="card-comment" id="cardComment">ひとことコメントがここに表示されます</p>
+
+              <div class="card-section">
+                <div class="card-section-title">プレイスタイル</div>
+                <div class="tag-row" id="tagsPlaystyle"><span class="tag-empty">未設定</span></div>
+              </div>
+              <div class="card-section">
+                <div class="card-section-title">好きなコンテンツ</div>
+                <div class="tag-row" id="tagsContent"><span class="tag-empty">未設定</span></div>
+              </div>
+              <div class="card-section">
+                <div class="card-section-title">プレイ時間帯（平日）</div>
+                <div class="tag-row" id="tagsWeekday"><span class="tag-empty">未設定</span></div>
+              </div>
+              <div class="card-section">
+                <div class="card-section-title">プレイ時間帯（休日）</div>
+                <div class="tag-row" id="tagsWeekend"><span class="tag-empty">未設定</span></div>
+              </div>
+            </div>
+            <div class="card-footer">SPIRITVALE COMMUNITY CARD</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  // ---- text field bindings ----
+  const bindings = [
+    { input: $('charName'), target: $('cardName'), empty: 'キャラ名' },
+    { input: $('mainJob'), target: $('cardMainJob'), empty: '―' },
+    { input: $('subJob'), target: $('cardSubJob'), empty: '―' },
+  ];
+  bindings.forEach(b => {
+    b.input.addEventListener('input', () => {
+      b.target.textContent = b.input.value.trim() || b.empty;
+    });
+  });
+
+  const commentInput = $('comment');
+  const commentCount = $('commentCount');
+  const cardComment = $('cardComment');
+  commentInput.addEventListener('input', () => {
+    commentCount.textContent = commentInput.value.length;
+    cardComment.textContent = commentInput.value.trim() || 'ひとことコメントがここに表示されます';
+  });
+
+  // ---- checkbox groups ----
+  const groupMap = {
+    playstyle: { target: 'tagsPlaystyle', tagClass: 'tag-playstyle' },
+    content: { target: 'tagsContent', tagClass: 'tag-content' },
+    weekday: { target: 'tagsWeekday', tagClass: 'tag-weekday' },
+    weekend: { target: 'tagsWeekend', tagClass: 'tag-weekend' }
+  };
+
+  function updateTags(groupName){
+    const container = document.querySelector(`[data-group="${groupName}"]`);
+    const checkedInputs = Array.from(container.querySelectorAll('input:checked'));
+    const conf = groupMap[groupName];
+    const target = $(conf.target);
+    target.innerHTML = '';
+
+    const labels = checkedInputs.map(el => el.value);
+
+    if(labels.length === 0){
+      target.innerHTML = '<span class="tag-empty">未設定</span>';
+      return;
+    }
+    labels.forEach(v => {
+      const span = document.createElement('span');
+      span.className = 'tag ' + conf.tagClass;
+      span.textContent = v;
+      target.appendChild(span);
+    });
+  }
+
+  Object.keys(groupMap).forEach(groupName => {
+    const container = document.querySelector(`[data-group="${groupName}"]`);
+    container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => updateTags(groupName));
+    });
+  });
+
+  // ---- image upload ----
+  const imageDrop = $('imageDrop');
+  const imageInput = $('imageInput');
+  const imagePlaceholder = $('imagePlaceholder');
+  const thumbImg = $('thumbImg');
+  const imageClearBtn = $('imageClearBtn');
+  const cardPortraitImg = $('cardPortraitImg');
+  const cardNoImage = $('cardNoImage');
+
+  let uploadedImageDataUrl = null;
+
+  function setImage(dataUrl){
+    uploadedImageDataUrl = dataUrl;
+
+    thumbImg.src = dataUrl;
+    thumbImg.style.display = 'block';
+    imagePlaceholder.style.display = 'none';
+    imageClearBtn.style.display = 'inline-block';
+
+    cardPortraitImg.src = dataUrl;
+    cardPortraitImg.style.display = 'block';
+    cardNoImage.style.display = 'none';
+  }
+
+  function clearImage(){
+    uploadedImageDataUrl = null;
+
+    thumbImg.removeAttribute('src');
+    thumbImg.style.display = 'none';
+    imagePlaceholder.style.display = 'block';
+    imageClearBtn.style.display = 'none';
+
+    cardPortraitImg.removeAttribute('src');
+    cardPortraitImg.style.display = 'none';
+    cardNoImage.style.display = 'block';
+
+    imageInput.value = '';
+  }
+
+  function handleFile(file){
+    if(!file) return;
+    if(!file.type.startsWith('image/')){
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => setImage(e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  imageDrop.addEventListener('click', () => imageInput.click());
+  imageInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+  imageDrop.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    imageDrop.classList.add('dragover');
+  });
+  imageDrop.addEventListener('dragleave', () => imageDrop.classList.remove('dragover'));
+  imageDrop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    imageDrop.classList.remove('dragover');
+    handleFile(e.dataTransfer.files[0]);
+  });
+
+  imageClearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearImage();
+  });
+
+  // ---- reset ----
+  $('resetBtn').addEventListener('click', () => {
+    if(!confirm('入力内容をすべてリセットしますか？')) return;
+    document.querySelectorAll('.form-panel input[type="text"], .form-panel textarea').forEach(el => el.value = '');
+    document.querySelectorAll('.form-panel input[type="checkbox"]').forEach(el => el.checked = false);
+    bindings.forEach(b => b.target.textContent = b.empty);
+    commentCount.textContent = '0';
+    cardComment.textContent = 'ひとことコメントがここに表示されます';
+    Object.keys(groupMap).forEach(updateTags);
+    clearImage();
+  });
+
+  // ---- download as PNG ----
+  // カードの内容をCanvasに直接描画する(DOMをまるごと画像化する方式は
+  // Chrome/EdgeだとSecurityError: Tainted canvasesで失敗するため使わない)
+  const CARD_COLORS = {
+    text0: '#5b4a63', text1: '#8d7a95', text2: '#bcadc4',
+    panelBorder: '#ffd9ea',
+    pink: '#ff8fbd', pinkDim: '#ffc2dc', pinkSoft: '#ffeaf3', pinkText: '#c65d86',
+    lavender: '#a893ff', lavenderDim: '#d6cbff', lavenderSoft: '#f1ecff', lavenderText: '#6c58c9',
+    mintSoft: '#e4faf3', mintDim: '#a7ecd7', mintText: '#2f9678',
+    peachSoft: '#fff2e2', peachDim: '#ffdbb0', peachText: '#c17a2e',
+    cardBg: '#fffdfb', commentBg: '#faf7fa'
+  };
+  const CARD_FONT = '"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
+
+  function roundRectPath(ctx, x, y, w, h, r){
+    const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  function wrapTextLines(ctx, text, maxWidth){
+    const paragraphs = text.split('\n');
+    const lines = [];
+    paragraphs.forEach(p => {
+      if(p === ''){ lines.push(''); return; }
+      let current = '';
+      for(const ch of p){
+        const test = current + ch;
+        if(current !== '' && ctx.measureText(test).width > maxWidth){
+          lines.push(current);
+          current = ch;
+        } else {
+          current = test;
+        }
+      }
+      lines.push(current);
+    });
+    return lines;
+  }
+
+  function drawImageCover(ctx, img, x, y, w, h){
+    const ir = img.width / img.height, tr = w / h;
+    let sx, sy, sw, sh;
+    if(ir > tr){ sh = img.height; sw = sh * tr; sx = (img.width - sw) / 2; sy = 0; }
+    else { sw = img.width; sh = sw / tr; sx = 0; sy = (img.height - sh) / 2; }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+
+  // items（チップ群）を折り返しながら描画/計測する。paintがfalseなら位置計算のみ行う
+  function layoutChips(ctx, items, x0, y0, maxWidth, colorFn, paint){
+    const paddingX = 12, chipH = 24, gap = 6, fontSize = 12;
+    ctx.font = `700 ${fontSize}px ${CARD_FONT}`;
+    let x = x0, y = y0;
+    items.forEach(text => {
+      const tw = ctx.measureText(text).width;
+      const chipW = tw + paddingX * 2;
+      if(x !== x0 && x + chipW > x0 + maxWidth){
+        x = x0;
+        y += chipH + gap;
+      }
+      if(paint){
+        const c = colorFn(text);
+        roundRectPath(ctx, x, y, chipW, chipH, chipH / 2);
+        ctx.fillStyle = c.bg;
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = c.border;
+        ctx.stroke();
+        ctx.fillStyle = c.text;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x + paddingX, y + chipH / 2 + 1);
+      }
+      x += chipW + gap;
+    });
+    return y + chipH;
+  }
+
+  function getFormSnapshot(){
+    const getChecked = (group) => Array.from(
+      document.querySelectorAll(`[data-group="${group}"] input:checked`)
+    ).map(el => el.value);
+    return {
+      name: $('charName').value.trim(),
+      mainJob: $('mainJob').value.trim(),
+      subJob: $('subJob').value.trim(),
+      comment: $('comment').value.trim(),
+      playstyle: getChecked('playstyle'),
+      content: getChecked('content'),
+      weekday: getChecked('weekday'),
+      weekend: getChecked('weekend')
+    };
+  }
+
+  // カード全体を描画し、最終的な縦幅(px)を返す。paint=falseの間は計測のみでdraw系呼び出しは行わない
+  function renderCard(ctx, W, H, data, image, paint){
+    const outerPad = 3, innerPad = 18;
+    const cx = outerPad + innerPad;
+    const cw = W - cx * 2;
+
+    if(paint && H){
+      roundRectPath(ctx, 0, 0, W, H, 24);
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, CARD_COLORS.pinkDim);
+      grad.addColorStop(1, CARD_COLORS.lavenderDim);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      roundRectPath(ctx, outerPad, outerPad, W - outerPad * 2, H - outerPad * 2, 21);
+      ctx.fillStyle = CARD_COLORS.cardBg;
+      ctx.fill();
+    }
+
+    let y = cx;
+
+    // 画像
+    const portraitSize = cw;
+    if(paint){
+      ctx.save();
+      roundRectPath(ctx, cx, y, portraitSize, portraitSize, 20);
+      ctx.clip();
+      if(image){
+        drawImageCover(ctx, image, cx, y, portraitSize, portraitSize);
+      } else {
+        const g = ctx.createLinearGradient(cx, y, cx + portraitSize, y + portraitSize);
+        g.addColorStop(0, CARD_COLORS.lavenderSoft);
+        g.addColorStop(1, CARD_COLORS.pinkSoft);
+        ctx.fillStyle = g;
+        ctx.fillRect(cx, y, portraitSize, portraitSize);
+        ctx.fillStyle = CARD_COLORS.text2;
+        ctx.font = `700 13px ${CARD_FONT}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('NO IMAGE', cx + portraitSize / 2, y + portraitSize / 2);
+      }
+      ctx.restore();
+      roundRectPath(ctx, cx, y, portraitSize, portraitSize, 20);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = CARD_COLORS.pinkDim;
+      ctx.stroke();
+    }
+    y += portraitSize + 16;
+
+    // 名前
+    if(paint){
+      ctx.fillStyle = CARD_COLORS.text0;
+      ctx.font = `800 22px ${CARD_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(data.name || 'キャラ名', W / 2, y + 18);
+    }
+    y += 18 + 14;
+
+    // MAIN / SUB バッジ
+    {
+      const badgeH = 28, gap = 8, padX = 12;
+      ctx.font = `700 12px ${CARD_FONT}`;
+      const mainText = 'MAIN  ' + (data.mainJob || '―');
+      const subText = 'SUB  ' + (data.subJob || '―');
+      const w1 = ctx.measureText(mainText).width + padX * 2;
+      const w2 = ctx.measureText(subText).width + padX * 2;
+      const totalW = w1 + w2 + gap;
+      let bx = (W - totalW) / 2;
+      if(paint){
+        [[mainText, w1, CARD_COLORS.pinkSoft, CARD_COLORS.pinkDim, CARD_COLORS.pinkText],
+         [subText, w2, CARD_COLORS.lavenderSoft, CARD_COLORS.lavenderDim, CARD_COLORS.lavenderText]]
+          .forEach(([text, w, bg, border, color]) => {
+            roundRectPath(ctx, bx, y, w, badgeH, badgeH / 2);
+            ctx.fillStyle = bg;
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = border;
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, bx + w / 2, y + badgeH / 2 + 1);
+            bx += w + gap;
+          });
+      }
+      y += badgeH + 14;
+    }
+
+    // 区切り
+    if(paint){
+      ctx.fillStyle = CARD_COLORS.pinkDim;
+      ctx.font = `400 13px ${CARD_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('・ ・ ・', W / 2, y + 10);
+    }
+    y += 10 + 14;
+
+    // ひとこと
+    {
+      const padding = 14, lineH = 22, fontSize = 13;
+      ctx.font = `600 ${fontSize}px ${CARD_FONT}`;
+      const text = data.comment || 'ひとことコメントがここに表示されます';
+      const lines = wrapTextLines(ctx, text, cw - padding * 2);
+      const boxH = lines.length * lineH + padding * 2;
+      if(paint){
+        roundRectPath(ctx, cx, y, cw, boxH, 14);
+        ctx.fillStyle = CARD_COLORS.commentBg;
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = CARD_COLORS.panelBorder;
+        ctx.stroke();
+        ctx.fillStyle = CARD_COLORS.text1;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        lines.forEach((line, i) => {
+          ctx.fillText(line, W / 2, y + padding + lineH * i + lineH / 2);
+        });
+      }
+      y += boxH + 16;
+    }
+
+    // タグセクション
+    const sections = [
+      { title: 'プレイスタイル', items: data.playstyle, colorFn: () => ({ bg: CARD_COLORS.pinkSoft, border: CARD_COLORS.pinkDim, text: CARD_COLORS.pinkText }) },
+      { title: '好きなコンテンツ', items: data.content, colorFn: () => ({ bg: CARD_COLORS.mintSoft, border: CARD_COLORS.mintDim, text: CARD_COLORS.mintText }) },
+      { title: 'プレイ時間帯（平日）', items: data.weekday, colorFn: () => ({ bg: CARD_COLORS.lavenderSoft, border: CARD_COLORS.lavenderDim, text: CARD_COLORS.lavenderText }) },
+      { title: 'プレイ時間帯（休日）', items: data.weekend, colorFn: () => ({ bg: CARD_COLORS.peachSoft, border: CARD_COLORS.peachDim, text: CARD_COLORS.peachText }) }
+    ];
+    sections.forEach((sec, idx) => {
+      if(paint){
+        ctx.fillStyle = CARD_COLORS.text1;
+        ctx.font = `700 11px ${CARD_FONT}`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(sec.title, cx, y + 11);
+      }
+      y += 11 + 8;
+
+      if(sec.items.length === 0){
+        if(paint){
+          ctx.fillStyle = CARD_COLORS.text2;
+          ctx.font = `600 12px ${CARD_FONT}`;
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('未設定', cx, y + 12);
+        }
+        y += 24;
+      } else {
+        y = layoutChips(ctx, sec.items, cx, y, cw, sec.colorFn, paint);
+      }
+      y += idx === sections.length - 1 ? 0 : 13;
+    });
+
+    // フッター
+    y += 18;
+    if(paint){
+      ctx.strokeStyle = CARD_COLORS.panelBorder;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx, y);
+      ctx.lineTo(cx + cw, y);
+      ctx.stroke();
+    }
+    y += 12;
+    if(paint){
+      ctx.fillStyle = CARD_COLORS.text2;
+      ctx.font = `700 10px ${CARD_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('S P I R I T V A L E   C O M M U N I T Y   C A R D', W / 2, y + 10);
+    }
+    y += 10;
+
+    y += innerPad + outerPad;
+    return y;
+  }
+
+  function loadImage(src){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  $('downloadBtn').addEventListener('click', async () => {
+    const btn = $('downloadBtn');
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '生成中…';
+    try{
+      const data = getFormSnapshot();
+      const image = uploadedImageDataUrl ? await loadImage(uploadedImageDataUrl) : null;
+
+      const SCALE = 2;
+      const W = 380;
+
+      // 1st pass: 高さを計測するだけ(描画はしない)
+      const measureCanvas = document.createElement('canvas');
+      measureCanvas.width = 10;
+      measureCanvas.height = 10;
+      const measureCtx = measureCanvas.getContext('2d');
+      const H = Math.ceil(renderCard(measureCtx, W, 0, data, image, false));
+
+      // 2nd pass: 確定した高さで実描画
+      const canvas = document.createElement('canvas');
+      canvas.width = W * SCALE;
+      canvas.height = H * SCALE;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(SCALE, SCALE);
+      renderCard(ctx, W, H, data, image, true);
+
+      canvas.toBlob((blob) => {
+        if(!blob){
+          alert('画像の生成に失敗しました。お使いのブラウザに対応していない可能性があります。スクリーンショットをご利用ください。');
+          return;
+        }
+        const a = document.createElement('a');
+        const fileNameBase = (data.name || 'character').replace(/[\\/:*?"<>|]/g, '_');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'spiritvale_card_' + fileNameBase + '.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, 'image/png');
+    }catch(err){
+      alert('画像の生成に失敗しました。スクリーンショットをご利用ください。');
+    }finally{
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  });
+})();
+</script>
+</body>
+</html>
